@@ -21,8 +21,41 @@ button{border:0;background:transparent;cursor:pointer}
 iframe{width:100%;height:100%;border:0;display:block;pointer-events:none}
 .gesture-layer{position:absolute;inset:0;z-index:20;cursor:grab;touch-action:none;user-select:none}
 .gesture-layer.dragging{cursor:grabbing}
+.mobile-hide-top,.mobile-hide-bottom{display:none;pointer-events:none;position:absolute;z-index:25}
 .readbox{display:none!important}
-@media(max-width:600px){.topbar{top:7px;padding:4px 6px}.voice{width:52px;height:52px}.voice svg{width:29px;height:29px}.status{font-size:12px;min-width:50px}}
+
+/* No celular/tablet, esconde os controles do próprio Heyzine que aparecem
+   fora da página e foram marcados no print. A navegação continua sendo feita
+   pelo toque/arraste do nosso leitor. */
+@media(max-width:768px){
+  .topbar{top:7px;padding:4px 6px}
+  .voice{width:52px;height:52px}
+  .voice svg{width:29px;height:29px}
+  .status{font-size:12px;min-width:50px}
+
+  .mobile-hide-top{
+    display:block;
+    top:120px;
+    right:0;
+    width:190px;
+    height:112px;
+    background:#f5f6f5;
+  }
+
+  .mobile-hide-bottom{
+    display:block;
+    left:0;
+    right:0;
+    bottom:0;
+    height:100px;
+    background:#f5f6f5;
+  }
+}
+
+@media(max-width:430px){
+  .mobile-hide-top{top:120px;width:175px;height:112px}
+  .mobile-hide-bottom{height:92px}
+}
 </style>
 </head>
 <body>
@@ -42,7 +75,10 @@ iframe{width:100%;height:100%;border:0;display:block;pointer-events:none}
       scrolling="no"
       src="https://heyzine.com/flip-book/3bfa80e7ae.html#page/1"
       title="Umbanda e Conhecimento">
-    </iframe><div class="gesture-layer" id="gestureLayer" aria-label="Arraste para mudar de página"></div>
+    </iframe>
+    <div class="gesture-layer" id="gestureLayer" aria-label="Arraste para mudar de página"></div>
+    <div class="mobile-hide-top" aria-hidden="true"></div>
+    <div class="mobile-hide-bottom" aria-hidden="true"></div>
   </div>
 
   <div class="readbox">
@@ -84,20 +120,30 @@ function escolherVoz(){
 }
 
 function humanizar(t){
- t=t.replace(/UMBANDA E CONHECIMENTO/gi,"")
-     .replace(/Noções de umbanda/gi,"")
-     .replace(/Obs\.?/gi,"Observação.")
-     .replace(/\b6,12,18,24\b/g,"seis, doze, dezoito e vinte e quatro")
-     .replace(/\b6, 12\b/g,"seis e doze")
-     .replace(/\b(15|25|26|27|30|17|20|23|24|4|8|2) de /g,function(_,n){
-       const mapa={2:"dois",4:"quatro",8:"oito",15:"quinze",17:"dezessete",20:"vinte",23:"vinte e três",24:"vinte e quatro",25:"vinte e cinco",26:"vinte e seis",27:"vinte e sete",30:"trinta"};
-       return (mapa[n]||n)+" de ";
-     })
-     .replace(/\(1891-1975\)/g,"")
-     .replace(/\s+/g," ")
-     .replace(/\s+([,.!?;:])/g,"$1")
-     .trim();
- return t;
+  // A capa é lida completa, incluindo o nome do autor.
+  if(String(paginaAtual)==="1"){
+    return "UMBANDA E CONHECIMENTO. Noções de umbanda. PAI MARCIO DE OXOSSE.";
+  }
+
+  t=t.replace(/UMBANDA E CONHECIMENTO/gi,"")
+      .replace(/Noções de umbanda/gi,"")
+      .replace(/Obs\.?/gi,"Observação.")
+      .replace(/\b6,12,18,24\b/g,"seis, doze, dezoito e vinte e quatro")
+      .replace(/\b6, 12\b/g,"seis e doze")
+      .replace(/\b(15|25|26|27|30|17|20|23|24|4|8|2) de /g,function(_,n){
+        const mapa={
+          2:"dois",4:"quatro",8:"oito",15:"quinze",17:"dezessete",
+          20:"vinte",23:"vinte e três",24:"vinte e quatro",
+          25:"vinte e cinco",26:"vinte e seis",27:"vinte e sete",30:"trinta"
+        };
+        return (mapa[n]||n)+" de ";
+      })
+      .replace(/\(1891-1975\)/g,"")
+      .replace(/\s+/g," ")
+      .replace(/\s+([,.!?;:])/g,"$1")
+      .trim();
+
+  return t;
 }
 
 function quebrar(t){
@@ -152,34 +198,71 @@ btn.addEventListener("click",function(e){
  else{parar(true)}
 });
 
-let sx=0,sy=0,drag=false,lastX=0;
-function inicio(x,y){sx=x;sy=y;lastX=x;drag=true;layer.classList.add("dragging")}
-function fim(x,y){
- if(!drag)return;
- drag=false;layer.classList.remove("dragging");
- const dx=x-sx,dy=y-sy;
- if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.2){dx<0?proxima():anterior()}
- else if(Math.abs(dx)<25&&Math.abs(dy)<25){
-   const w=layer.clientWidth;
-   x<w*.38?anterior():x>w*.62?proxima():null;
- }
-}
-layer.addEventListener("touchstart",e=>{const t=e.changedTouches[0];inicio(t.clientX,t.clientY)},{passive:true});
-layer.addEventListener("touchend",e=>{const t=e.changedTouches[0];fim(t.clientX,t.clientY)},{passive:true});
-layer.addEventListener("mousedown",e=>{if(e.button===0)inicio(e.clientX,e.clientY)});
-window.addEventListener("mouseup",e=>fim(e.clientX,e.clientY));
-layer.addEventListener("wheel",e=>{e.preventDefault();if(Math.abs(e.deltaY)>15||Math.abs(e.deltaX)>15){(e.deltaX+e.deltaY)>0?proxima():anterior()}},{passive:false});
+let sx=0,sy=0,drag=false;
 
-let mouseDown=false,mouseX=0;
-layer.addEventListener("mousedown",e=>{mouseDown=true;mouseX=e.clientX});
-layer.addEventListener("mouseup",e=>{if(mouseDown){const dx=e.clientX-mouseX;if(Math.abs(dx)>40)dx<0?proxima():anterior();mouseDown=false}});
+function inicio(x,y){
+  sx=x;
+  sy=y;
+  drag=true;
+  layer.classList.add("dragging");
+}
+
+function fim(x,y){
+  if(!drag)return;
+  drag=false;
+  layer.classList.remove("dragging");
+
+  const dx=x-sx;
+  const dy=y-sy;
+
+  // Arraste horizontal: celular/tablet e também mouse no PC.
+  if(Math.abs(dx)>55 && Math.abs(dx)>Math.abs(dy)*1.2){
+    dx<0 ? proxima() : anterior();
+    return;
+  }
+
+  // Clique/toque nas laterais da tela.
+  if(Math.abs(dx)<25 && Math.abs(dy)<25){
+    const w=layer.clientWidth;
+    if(x<w*.38) anterior();
+    else if(x>w*.62) proxima();
+  }
+}
+
+layer.addEventListener("touchstart",e=>{
+  const t=e.changedTouches[0];
+  inicio(t.clientX,t.clientY);
+},{passive:true});
+
+layer.addEventListener("touchend",e=>{
+  const t=e.changedTouches[0];
+  fim(t.clientX,t.clientY);
+},{passive:true});
+
+layer.addEventListener("mousedown",e=>{
+  if(e.button===0) inicio(e.clientX,e.clientY);
+});
+
+window.addEventListener("mouseup",e=>{
+  fim(e.clientX,e.clientY);
+});
+
+layer.addEventListener("wheel",e=>{
+  e.preventDefault();
+  if(Math.abs(e.deltaY)>15 || Math.abs(e.deltaX)>15){
+    (e.deltaX+e.deltaY)>0 ? proxima() : anterior();
+  }
+},{passive:false});
+
 window.addEventListener("keydown",e=>{
- if(e.key==="ArrowRight"||e.key==="PageDown")proxima();
- if(e.key==="ArrowLeft"||e.key==="PageUp")anterior();
- if(e.key===" "&&vozAtiva){
-   e.preventDefault();
-   if(speechSynthesis.paused)speechSynthesis.resume();else if(speechSynthesis.speaking)speechSynthesis.pause();
- }
+  if(e.key==="ArrowRight"||e.key==="PageDown") proxima();
+  if(e.key==="ArrowLeft"||e.key==="PageUp") anterior();
+
+  if(e.key===" " && vozAtiva){
+    e.preventDefault();
+    if(speechSynthesis.paused) speechSynthesis.resume();
+    else if(speechSynthesis.speaking) speechSynthesis.pause();
+  }
 });
 
 mostrarPaginaInicial();
