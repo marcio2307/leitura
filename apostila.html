@@ -33,28 +33,40 @@ iframe{width:100%;height:100%;border:0;display:block;pointer-events:none}
   .voice svg{width:29px;height:29px}
   .status{font-size:12px;min-width:50px}
 
+  /* Oculta somente a barra de ferramentas do Heyzine marcada no print.
+     Fica no canto superior direito, fora do botão de voz. */
   .mobile-hide-top{
     display:block;
-    top:120px;
+    top:78px;
     right:0;
-    width:190px;
+    width:245px;
     height:112px;
     background:#f5f6f5;
   }
 
+  /* Oculta a faixa/branding que fica abaixo do livro, sem cobrir
+     os cantos inferiores onde ficam as setas de navegação. */
   .mobile-hide-bottom{
     display:block;
-    left:0;
-    right:0;
+    left:40px;
+    right:40px;
     bottom:0;
-    height:100px;
+    height:42px;
     background:#f5f6f5;
   }
 }
 
 @media(max-width:430px){
-  .mobile-hide-top{top:120px;width:175px;height:112px}
-  .mobile-hide-bottom{height:92px}
+  .mobile-hide-top{
+    top:78px;
+    width:225px;
+    height:112px;
+  }
+  .mobile-hide-bottom{
+    left:38px;
+    right:38px;
+    height:42px;
+  }
 }
 </style>
 </head>
