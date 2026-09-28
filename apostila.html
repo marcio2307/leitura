@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Umbanda e Conhecimento — Leitura por Voz</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#f5f6f5;font-family:Arial,Helvetica,sans-serif}
+body{display:flex}
+.reader{width:100%;height:100dvh;max-width:1600px;margin:auto;padding:0;position:relative;background:#fff}
+.topbar{position:absolute;z-index:50;top:10px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.92);box-shadow:0 4px 16px rgba(0,0,0,.16);backdrop-filter:blur(8px)}
+.controls{display:flex;align-items:center;gap:8px}
+button{border:0;background:transparent;cursor:pointer}
+.voice{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.96);border:1.5px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,.15);padding:0}
+.voice.ativo{background:#e9f9ed;box-shadow:0 0 0 3px rgba(42,164,73,.18),0 4px 16px rgba(0,0,0,.16)}
+.voice svg{width:31px;height:31px;fill:none;stroke:#2aa449;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.voice svg path:first-child{fill:#2aa449;stroke:#2aa449;stroke-width:2}
+.status{min-width:55px;text-align:center;font-size:13px;font-weight:600;color:#444}
+.bookwrap{position:relative;width:100%;height:100%;overflow:hidden;background:#f5f6f5}
+iframe{width:100%;height:100%;border:0;display:block;pointer-events:none}
+.gesture-layer{position:absolute;inset:0;z-index:20;cursor:grab;touch-action:none;user-select:none}
+.gesture-layer.dragging{cursor:grabbing}
+.readbox{display:none!important}
+@media(max-width:600px){.topbar{top:7px;padding:4px 6px}.voice{width:52px;height:52px}.voice svg{width:29px;height:29px}.status{font-size:12px;min-width:50px}}
+</style>
+</head>
+<body>
+<div class="reader">
+  <div class="topbar">
+<div class="controls">
+<button class="voice" id="voiceBtn" type="button" aria-label="Ativar leitura por voz" aria-pressed="false" title="Ativar ou desativar leitura por voz">
+<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M12 25h10l14-12v38L22 39H12z"></path><path d="M43 22c4 4 4 16 0 20"></path><path d="M49 16c8 8 8 24 0 32"></path></svg>
+</button>
+<div class="status" id="status" aria-live="polite">1 / 29</div>
+</div>
+</div>
+<div class="bookwrap">
+    <iframe id="livro"
+      allowfullscreen
+      allow="autoplay; fullscreen; clipboard-write"
+      scrolling="no"
+      src="https://heyzine.com/flip-book/3bfa80e7ae.html#page/1"
+      title="Umbanda e Conhecimento">
+    </iframe><div class="gesture-layer" id="gestureLayer" aria-label="Arraste para mudar de página"></div>
+  </div>
+
+  <div class="readbox">
+    <h2 id="tituloLeitura">Texto da página 1</h2>
+    <div class="text" id="textoPagina"></div>
+    <div class="hint">
+      O leitor de voz usa o texto real extraído do PDF enviado. Os controles de página acima também mudam a página do Heyzine.
+    </div>
+  </div>
+</div>
+
+<script>
+const paginas={"1": "UMBANDA E CONHECIMENTO\nNoções de umbanda\nPAI MARCIO DE OXOSSE", "2": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nUMBANDA PALAVRA AFRO-BRASILEIRA, SIGNIFICA ORA O SACERDOTE ORA ONDE SE PRATICA O CULTO, TAMBÉM SIGNIFICA UNIÃO DE DUAS BANDAS. O ESPÍRITO E A MATÉRIA.\n\nA Umbanda é uma religião que surgiu no Brasil no dia 15 de novembro de 1908. O anunciador desse credo foi o médium Zélio Fernandino de Moraes (1891-1975). Essa religião abrange aspectos do candomblé, espiritismo e catolicismo.\n\nAs Entidades (caboclos) da umbanda: A Umbanda é formada por Comunidades de espíritos (CABOCLOS) que se manifestam através da INCORPORAÇÃO, Dentro das SETE LINHAS da lei da Umbanda (PRINCIPAIS E VÁRIAS FALANGES). Houve uma união entre o culto africano (DOS NEGROS E ESCRAVOS) com o culto do", "3": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\níndio Brasileiro e outras Nações que conquistaram Regiões do Brasil, daí a Relação entre o ORIXÁ do CANDOMBLÉ e o CABOCLO da UMBANDA.\n\nLINHAS: São Vários tipos de Manifestação dos CABOCLOS.\nFALANGE: São as Ramificações dessas LINHAS.\n\nAS PRINCIPAIS LINHAS SÃO:\nOxalá, Iemanjá, Ogum, Erê, Exu, Oxum, Iansã, Xangô, Oxóssi, Nanã Buruquê, (Pretos velhos), Obaluaê.", "4": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nOxalá. Iemanjá. Oxóssi. Erê.", "5": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nOxum. Iansã. Xangô. Ogum.", "6": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nObaluaê. Nanã Buruquê.\nExu e Pomba gira.", "7": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nOrixás Masculinos: Oxalá, Ogum, Oxóssi, Xangô, Obaluaê (Omulu), Oxumaré, Ossãe, Iroko, exu e Erê.\n\nOrixás Femininos: Iemanjá, Nanã Buruquê, Oxum, Iansã, Obá, Ossãe.\n\nRelação Entre os Orixás, Caboclos e Santos da Igreja Católica.\n\nOlorum/Zambi - DEUS-PAI\nOxalá - Jesus Cristo, filho\nOrixás - Divino Espírito Santo\n\nO que é Zambi:\nNa Umbanda e na nação de Angola significa e equivale literalmente a Deus.", "8": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nOxalá: Na hierarquia dos orixás é o mais conceituado, pois sendo o mais velho. É considerado o pai dos orixás, já que é filho dos Deus supremo Olurum.\n\nOrigem: Iorubá (Nagô)\nSeu Dia: Sexta-Feira\nCor: Branco e Ouro\nDistintivo: Sol, pomba branca, Céu, (Infinito).\nBebidas: Águas, Mugunzá branco, Arroz doce com leite, Mel e Frutas Finas.\nProibição: Sal e dendê\nSacrifícios: Cabras, galinhas, pombos.\n25 de dezembro: Jesus Cristo (Oxalá)\nSaudação: èpa bàbá! Xeuê epa Babá.", "9": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nIemanjá: Deusa do Mar, Protetora das esposas e mães de família. (mãe dos orixás) - (padroeira dos marinheiros).\nSeu Dia: Sábado.\nCor: Branco e azul claro.\nDistintivo: Abebé um leque em forma circular.\nOrigem: Iorubá (Nagô)\nComidas: Peixe do mar (branco), Arroz doce com mel, Mugunzá branco, Mel frutas finas.\nBebidas: Água, Cerveja branca, Vinhos e Refrigerantes.\n15 de agosto: (Nossa Senhora da Assunção) Iemanjá no Ceará: em outros estados outras santas.\nSaudação: Odoia, O doce iaba.", "10": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nNanã Buruquê: Deusa do Reino da morte, Considerada a mãe de todos os orixás. Seu reino e nas chuvas, lamas vazantes, lagos rasos lamacentos, Igarapés. Teve três filhos com Oxalá: Omulu, Iroko ou Tempo e Oxumarê.\n\nSeu dia: Segunda-feira e Sábado.\nCor: Branco com azul escuro e roxo.\nComidas: Inhame, Arroz doce, Pipoca branca, Mugunzá de Milho branco e todas as comidas de preto velho.\nSacrifícios: Cabras e galinhas.\nOrigem: Daomé (Gegê).\n26 de julho: (Santa Ana) Nanã Buruquê.\nSaudação: Saluba.", "11": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nOgum: Orixá das guerras, lutas e demandas, Filho de Iemanjá com Oxalá. Depois do Exu é o orixá mais próximos dos humanos.\n\nSeu dia: Terça-feira\nCor: Vermelho e branco\nComidas: Inhame, Massa de macaxeira, Peito de Frango, Carnes finas na manteiga e frutas finas.\nSacrifícios: Galos, perus e patos.\nOrigem: Iorubá (Nagô).\nDistintivo: Espada e lança.\nBebidas: Água, Cerveja Branca e vinhos\nDomínios: Caminhos e guerras\n23 de abril: (São Jorge) Ogum: na Bahia Santo Antônio.\nSaudação: Ògún ieé!", "12": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nOxóssi: Orixá caçador, seu domínio são as matas e as florestas.\nSeu dia: quinta-feira\nOrigem: Iorubá (nagô).\nFilho de Oxalá com Iemanjá.\nCor: Verde\nDistintivo: Arco e flecha\nComidas: todo tipo de aves, caças e todo tipo de frutas.\nBebidas: Água, Cachaça com mel e vinhos.\nSacrifícios: Bodes, Porcos e Galos.\n20 de janeiro (São Sebastião) Oxóssi\nSaudação: Okê, Okê Arô, Oxóssiê, Okê Odé (significa salve o caçador).", "13": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nOxum: Deusa dos rios, lagos, fontes e cachoeiras. E protetora das meninas moças e mães jovens, é também a deusa do casamento, do amor e dos prazeres da vida. Foi esposa de Xangô.\nSeus dias: Quarta-feira e sábado.\nFilha de Oxalá e Iemanjá.\nOrigem: Iorubá (nagô)\nDistintivo joias em geral, Perfumes Finos.\nCor: azul e branco; amarelo representando o luxo e a riqueza.\nComidas: Omolocum - é feito com feijão fradinho cozido, refogado com cebola ralada, pó de camarão defumado, sal, azeite de dendê ou azeite doce.\nBebidas: Água e vinhos finos.\nSacrifícios: Cabras, patos e galinhas.\n8 de dezembro: (Nossa Senhora da Conceição) Oxum\nSaudação: Ora ieiêo, aieeiô mamãe oxum.", "14": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nIANSÃ: Deusa dos ventos e das tempestades, é quem domina os eguns (espíritos de pessoas mortas). foi esposa de xangô.\nSeus dias: quarta-feira e sábado\nFilha de Oxalá com Iemanjá.\nOrigem: Iorubá (Nagô)\nCor: Marrom avermelhado, Rosa Coral, Amarelo e Vermelho.\nComidas: acarajé, Camarão, cozido com quiabo, frutas finas.\nBebidas: Água e vinhos finos.\nSacrifício: Cabras e Galinhas.\nFoi esposa de Ogum e o deixou por Xangô.\n4 de dezembro: (Santa Barbara) Iansã\nSaudação: Epahei, Epahei oya.", "15": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nXangô: Deus dos trovões, dos raios e da justiça, e padroeiro dos intelectuais, dos reis e dos artistas, Seu reino e no alto das serras, nas pedreiras, daí se diz Xangô e pedra.\nSeu dia: quarta-feira\nNúmeros sagrados: 6, 12\nOrigem: Iorubá (nagô)\nFilho de Oxalá e Iemanjá\nDistintivo: Machado (oxé) - machado de dois lados\nCor: no Candomblé e vermelho e branco, na umbanda sua cor e marrom e vermelho.\nComidas: Caruru de quiabo, camarão e frutas finas.\nBebidas: Água, cerveja preta e vinhos finos.\nSacrifícios: Bodes, Galos\n24 de junho (São João Batista)\n30 de setembro: (São Jeronimo)\nSaudação: Kaô Kabecilê é uma expressão que significa “Venham Saudar o Rei”", "16": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nObaluaê – Omulu:\nO senhor das doenças, tanto pode evitar as doenças, como pode causá-las, mais a sua prioridade e a cura. Foi criado por Iemanjá após ter sido abandonado por sua mãe Nanã.\n\nSeu dia: segunda-feira\nOrigem: Daomé (Gegê)\nFilho de oxalá com Nanã Buruquê.", "17": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nDistintivo: xaxará tem finalidade de afastar os espíritos (eguns) para o seu espaço sagrado, e eliminar as energias negativas da comunidade, proporcionando a longevidade.\n\nCor: Branco com Preto, Marrom e roxo em alguns lugares\nComidas: Pipoca sem sal, Arroz com leite e Mugunzá Branco.\nBebidas: Água e leite.\nSacrifícios: Bodes, Galos e Pombos brancos.\nSeu reino e no cemitério, ou seja, onde houver corpos sepultados.\n2 de novembro (Finados)\n17 de dezembro: (São Lazaro)\nSaudação: Atotô ou Atotô Obaluaê", "18": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nErês: São Orixás Gêmeos e crianças, Filiações diversas, e cultos também diversos. Apresentam-se de maneira simples e tem a maior abertura para a incorporação.\nSeu dia: Domingo\nCor: Azul claro com Rosa, cores diversas.\nComidas: bolos, Doces, Balas Frutas etc.\nBebidas: Água, Aluá, Refrescos, alguns gostam de bebidas fortes.\nSacrifícios: Galinhas, Pombos e Patos.\nSaudação: Ibeje, Beje, Salve Cosme e Damião, salve os Erês ou Salve a Ibejada.\n27 de setembro: (São Cosme e São Damião).", "19": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nExu: É o mensageiro dos orixás, tanto no mundo dos seres vivos, como no mundo dos orixás, e almas dos seres mortos. No culto africano (Iorubá) cada orixá tem seu próprio Exu: na umbanda dizemos que todo preto velho carrega um exu, assim sendo o Exu descarrega, desmancha e retira a demanda: o Preto velho limpa, abre os caminhos, reanima, aconselha, e o mais importante, cura (espiritual e material).\n\nSeu dia: segunda-feira\nSuas horas sagradas: 6, 12, 18, 24\nFilho de oxalá com Iemanjá\nOrigem: Iorubá (nagô)\nCor: preto com vermelho.\nComidas: Farofa, Pipoca, com dendê, Frango, Carnes etc.\nBebidas: Cervejas, marafo, Água e vinhos finos.\nSacrifícios: Diversos.\nSímbolo: Ogô – na Umbanda diversos.", "20": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nObs.: Não há um santo na umbanda que represente o exu, daí muitos assimilam o Exu como sendo um anjo mal ou até mesmo o demônio, o que não é certo.\n\nSuas festas: fevereiro, Julho, Novembro.\nSaudação: Laroiê, Exuê, Exú Mojubá\n\nOutros Orixás menos cultuados na Umbanda\n\nOxumarê\nFilho de Oxalá com Nanã. Durante 6 meses é masculino, nos outros 6 meses é feminino. Quando homem é representado pelo arco íris, quando mulher representado pela cobra.\nDia: terça feira.\nCor: Verde e Amarelo ou as cores do arco íris.\nSão Bartolomeu (Oxumaré).\nSaudação: Arroboboi Oxumarê!", "21": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nIroko ou Tempo\nFilho de oxalá com NANÃ\nCOR: Branco e Cinza.\nDia: Terça Feira\nSão Francisco de Assis (tempo)\nSaudação: Ìrókò iná iso èro!", "22": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nOssain\nFilho de oxalá com Iemanjá\nCor: Vermelho e azul, Verde e branco\nDia: Quinta feira e sábado\nSão Benedito (Ossain)", "23": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nObá:\nFilha de oxalá com Iemanjá.\nCor: Amarelo e Vermelho\nDia: Quarta feira\nSanta Joana D´arc (Obá)", "24": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nErvas dos orixás\n\nOXALÁ\nLevante\nErva Cidreira\nAlecrim, Hortelã\nBoldo, algodoeiro\ncolônia, girassol\nfuncho\nmalva cheirosa\n\nYEMANJÁ\nUnha de vaca\nfolhas de Lágrimas de Nossa Senhora\nMastruço, Chapéu de couro\nJasmim, anis\nerva de Santa Luzia\npata de vaca, hortelã\nalfazema, lavanda\n\nFALANGE DAS CRIANÇAS\nAmoreira, Alfazema\ngroselheira\nhortelã\nrosa branca\nalecrim, laranjeira\nmanjericão\nsálvia\n\nOXUM\nalfavaca, arnica\ncalêndula, camomila\nerva cidreira\nipê amarelo, gengibre, rosa branca e amarela\n\nOXOSSI\ncarapiá ou contra erva\nsalgueiro chorão\njurema, eucalipto\nalecrim do campo\nguiné caboclo, samambaia\npariparoba, alfavaca\n\nYANSÃ\namor agarradinho\nbambu, dormideira\nromã, espada de Iansã\nlouro, manjericão\npitangueira, alfazema\n\nXANGO\nCafé (Folhas)\nMangueira (Folhas)\nErva de São João\nalfavaca roxa\nflamboyant, manjerona\nhortelã, levante\ncipó mil-homens\nmentrasto, nega mina\n\nOGUM\nFlecha de Ogum\nErva de Bicho (Folha de Jurupitã)\nvence tudo - abre caminho\naroeira, pinhão roxo\ncarqueja, pata de vaca\nagrião, losna, jatobá\nespada de São Jorge\n\nPRETOS VELHOS\nGuiné\nEucalipto\nArruda\nmanjerona\npinhão roxo\n\nEXU\nMamona, carqueja,\npicão preto, unha de gato, arruda,\ncomigo ninguém pode, beladona,\ncactus, cana de açúcar, mangueira,\npimenta da costa, urtiga\npinhão roxo, chorão\n\nOMULU OU OBALUAIÊ\nalfavaca roxa\nagapanto lilás\nbabosa\nfruta de pomba\nmostarda, mamona\ngervão, velame\ncanela de velho\n\nNANÃ\nalfavaca, assa peixe\nerva cidreira\ncipreste, avenca\nmanacá, quaresmeira\npinhão roxo\ncrisântemos roxos\noriri", "25": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nO que são pontos riscados? ...\n\nEstes pontos riscados estão ligados ao astral e podem atrair ou repelir energias.\n\nOs Ponto riscado ou ponto cabalístico em religiões afro-brasileiras como o Candomblé, a Umbanda, a Quimbanda e a Quiumbanda é uma grafia sagrada que se refere à diagramas desenhados a mão como ângulos, retas, flechas, símbolos representativos, desenhos geométricos, pontos cardeais etc representando a assinatura do Guia. Os desenhos são geralmente feitos com um giz especial chamado pemba.\n\nExemplos de Pontos Riscados:", "26": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nO que é pemba?\n\nPemba é um giz de formato cônico-arredondada feito de calcário que pode ter diferentes cores, usado ritualisticamente em religiões afro-brasileiras como o Candomblé, a Umbanda, a Quimbanda e a Quiumbanda.\n\nA pemba é utilizada em praticamente todos os rituais de Umbanda, podendo ser eles: para cruzamento dos filhos e do Terreiro antes da abertura dos trabalhos, para batizados, benzimentos, coroações, preparações de cabeça, para descarrego, consagração de objetos fornecido às entidades, trabalhos feitos pelas entidades para os consulentes e também para os filhos da casa e até mesmo para cruzamento de imagens antes de serem colocadas no Gongá.", "27": "UMBANDA E CONHECIMENTO\nNoções de umbanda\n\nHino da Umbanda\n\nUmbanda\nRefletiu a Luz Divina\nCom todo seu esplendor\nVem do reino de Oxalá\nOnde há paz e amor\nLuz que refletiu na terra\nLuz que refletiu no mar\nLuz que veio de Aruanda\nPara tudo iluminar\n\nA Umbanda é paz e amor\nÉ um mundo cheio de Luz\nÉ força que nos dá vida\nE a grandeza nos conduz\n\nAvante, filhos de fé\nComo a nossa lei não há\nLevando ao mundo inteiro\nA bandeira de Oxalá\n\nLevando ao mundo inteiro\nA bandeira de Oxalá", "28": "UMBANDA E CONHECIMENTO\nNoções de umbanda", "29": "UMBANDA E CONHECIMENTO\nNoções de umbanda"};
+const TOTAL=29;
+const BASE="https://heyzine.com/flip-book/3bfa80e7ae.html";
+let paginaAtual=1,vozAtiva=false,filas=[],indice=0,utter=null;
+const iframe=document.getElementById("livro");
+const btn=document.getElementById("voiceBtn");
+const status=document.getElementById("status");
+const layer=document.getElementById("gestureLayer");
+
+function atualizar(){
+ status.textContent=paginaAtual+" / "+TOTAL;
+ iframe.src=BASE+"#page/"+paginaAtual;
+ if(vozAtiva)setTimeout(lerPagina,500);
+}
+function irPara(n){
+ parar(false);
+ const nova=Math.max(1,Math.min(TOTAL,Number(n)));
+ if(nova===paginaAtual){if(vozAtiva)setTimeout(lerPagina,150);return}
+ paginaAtual=nova; atualizar();
+}
+function anterior(){irPara(paginaAtual-1)}
+function proxima(){irPara(paginaAtual+1)}
+
+function escolherVoz(){
+ const v=speechSynthesis.getVoices();
+ return v.find(x=>x.lang.toLowerCase()==="pt-br")||v.find(x=>x.lang.toLowerCase().startsWith("pt"))||null;
+}
+
+function humanizar(t){
+ t=t.replace(/UMBANDA E CONHECIMENTO/gi,"")
+     .replace(/Noções de umbanda/gi,"")
+     .replace(/Obs\.?/gi,"Observação.")
+     .replace(/\b6,12,18,24\b/g,"seis, doze, dezoito e vinte e quatro")
+     .replace(/\b6, 12\b/g,"seis e doze")
+     .replace(/\b(15|25|26|27|30|17|20|23|24|4|8|2) de /g,function(_,n){
+       const mapa={2:"dois",4:"quatro",8:"oito",15:"quinze",17:"dezessete",20:"vinte",23:"vinte e três",24:"vinte e quatro",25:"vinte e cinco",26:"vinte e seis",27:"vinte e sete",30:"trinta"};
+       return (mapa[n]||n)+" de ";
+     })
+     .replace(/\(1891-1975\)/g,"")
+     .replace(/\s+/g," ")
+     .replace(/\s+([,.!?;:])/g,"$1")
+     .trim();
+ return t;
+}
+
+function quebrar(t){
+ const r=[];
+ const frases=t.split(/(?<=[.!?])\s+/);
+ let b="";
+ frases.forEach(f=>{
+   if((b+" "+f).trim().length>600&&b){r.push(b.trim());b=f}
+   else b+=(b?" ":"")+f;
+ });
+ if(b.trim())r.push(b.trim());
+ return r;
+}
+
+function lerPagina(){
+ if(!("speechSynthesis" in window))return;
+ speechSynthesis.cancel();
+ const texto=humanizar(paginas[String(paginaAtual)]||"");
+ if(!texto)return;
+ filas=quebrar(texto);
+ indice=0;
+ btn.classList.add("ativo");
+ btn.setAttribute("aria-pressed","true");
+ falarProximo();
+}
+
+function falarProximo(){
+ if(!vozAtiva||indice>=filas.length){
+   if(indice>=filas.length)btn.classList.remove("ativo");
+   return;
+ }
+ utter=new SpeechSynthesisUtterance(filas[indice]);
+ utter.lang="pt-BR";
+ utter.rate=.86;
+ utter.pitch=.98;
+ utter.volume=1;
+ const v=escolherVoz(); if(v)utter.voice=v;
+ utter.onend=function(){indice++;falarProximo()};
+ utter.onerror=function(){btn.classList.remove("ativo")};
+ speechSynthesis.speak(utter);
+}
+
+function parar(desligar=true){
+ if("speechSynthesis" in window)speechSynthesis.cancel();
+ filas=[];indice=0;utter=null;
+ if(desligar){vozAtiva=false;btn.classList.remove("ativo");btn.setAttribute("aria-pressed","false")}
+}
+
+btn.addEventListener("click",function(e){
+ e.stopPropagation();
+ if(!vozAtiva){vozAtiva=true;btn.classList.add("ativo");btn.setAttribute("aria-pressed","true");lerPagina()}
+ else{parar(true)}
+});
+
+let sx=0,sy=0,drag=false,lastX=0;
+function inicio(x,y){sx=x;sy=y;lastX=x;drag=true;layer.classList.add("dragging")}
+function fim(x,y){
+ if(!drag)return;
+ drag=false;layer.classList.remove("dragging");
+ const dx=x-sx,dy=y-sy;
+ if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.2){dx<0?proxima():anterior()}
+ else if(Math.abs(dx)<25&&Math.abs(dy)<25){
+   const w=layer.clientWidth;
+   x<w*.38?anterior():x>w*.62?proxima():null;
+ }
+}
+layer.addEventListener("touchstart",e=>{const t=e.changedTouches[0];inicio(t.clientX,t.clientY)},{passive:true});
+layer.addEventListener("touchend",e=>{const t=e.changedTouches[0];fim(t.clientX,t.clientY)},{passive:true});
+layer.addEventListener("mousedown",e=>{if(e.button===0)inicio(e.clientX,e.clientY)});
+window.addEventListener("mouseup",e=>fim(e.clientX,e.clientY));
+layer.addEventListener("wheel",e=>{e.preventDefault();if(Math.abs(e.deltaY)>15||Math.abs(e.deltaX)>15){(e.deltaX+e.deltaY)>0?proxima():anterior()}},{passive:false});
+
+let mouseDown=false,mouseX=0;
+layer.addEventListener("mousedown",e=>{mouseDown=true;mouseX=e.clientX});
+layer.addEventListener("mouseup",e=>{if(mouseDown){const dx=e.clientX-mouseX;if(Math.abs(dx)>40)dx<0?proxima():anterior();mouseDown=false}});
+window.addEventListener("keydown",e=>{
+ if(e.key==="ArrowRight"||e.key==="PageDown")proxima();
+ if(e.key==="ArrowLeft"||e.key==="PageUp")anterior();
+ if(e.key===" "&&vozAtiva){
+   e.preventDefault();
+   if(speechSynthesis.paused)speechSynthesis.resume();else if(speechSynthesis.speaking)speechSynthesis.pause();
+ }
+});
+
+mostrarPaginaInicial();
+function mostrarPaginaInicial(){status.textContent="1 / 29";iframe.src=BASE+"#page/1"}
+</script>
+</body>
+</html>
